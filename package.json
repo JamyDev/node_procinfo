@@ -1,0 +1,15 @@
+{
+  "name": "procinfo-universal",
+  "version": "0.0.2-1",
+  "description": "Shows information about a process, like CPU usage, memory usage and disk usage. It should work on most major platforms (including Windows)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jamy Timmermans <me@jamy.be>",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "sigar": "git@github.com:JamyDev/node-sigar.git"
+  }
+}
