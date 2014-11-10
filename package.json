@@ -1,6 +1,6 @@
 {
   "name": "procinfo-universal",
-  "version": "0.0.2-1",
+  "version": "0.0.2-3",
   "description": "Shows information about a process, like CPU usage, memory usage and disk usage. It should work on most major platforms (including Windows)",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,26 @@
   "author": "Jamy Timmermans <me@jamy.be>",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^2.4.1",
-    "sigar": "git@github.com:JamyDev/node-sigar.git"
-  }
+    "lodash": "^2.4.1"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JamyDev/node_procinfo.git"
+  },
+  "keywords": [
+    "process",
+    "info",
+    "platform",
+    "independent",
+    "win32",
+    "linux"
+  ],
+  "bugs": {
+    "url": "https://github.com/JamyDev/node_procinfo/issues"
+  },
+  "homepage": "https://github.com/JamyDev/node_procinfo"
 }
