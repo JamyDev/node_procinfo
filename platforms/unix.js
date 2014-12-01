@@ -3,6 +3,7 @@ var procinfo = require('procinfo');
 function UnixProcInfo (pid) {
     var $pInfo = this;
     $pInfo.pid = pid;
+    $pInfo.closed = false;
 
     $pInfo.data = "";
 }
@@ -35,7 +36,7 @@ UnixProcInfo.prototype.getCurrentDiskIO = function (callback) {
             callback("Failed to get disk: "+err, 0);
         } else {
             // var disk = res.IODataBytesPersec;
-            callback(null, disk);
+            callback(null, 0);
         }
     });
 };
@@ -53,6 +54,10 @@ UnixProcInfo.prototype.getAllStats = function (callback) {
             callback(null, all);
         }
     });
+};
+
+UnixProcInfo.prototype.close = function () {
+    this.closed = true;
 };
 
 module.exports = UnixProcInfo;

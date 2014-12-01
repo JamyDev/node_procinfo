@@ -7,7 +7,7 @@ var exec        = require("child_process").exec,
 function Win32ProcInfo (pid) {
     var $pInfo = this;
     $pInfo.pid = pid;
-    $pInfo.wmic = spawn("wmic", {detached: true});
+    $pInfo.wmic = spawn("wmic", [], {detached: true});
 
     $pInfo.wmic.stdout.on("data", function (data) {
         $pInfo.data += data.toString("UTF8").replace("wmic:root\\cli>", "");
@@ -18,10 +18,10 @@ function Win32ProcInfo (pid) {
     $pInfo.data = "";
 
     $pInfo.timeout = setTimeout(function () {
-        $pInfo.wmic.kill();
+        if (!$pInfo.wmic.killed) {
+            $pInfo.wmic.kill();
+        }
     }, 60000);
-
-    // Add interval to kill WMIC
 }
 
 Win32ProcInfo.prototype.getCurrentCPU = function (callback) {
@@ -86,12 +86,23 @@ Win32ProcInfo.prototype.WMICMessage = _.throttle(function () {
     var $pInfo = this;
     clearTimeout($pInfo.timeout);
     $pInfo.timeout = setTimeout(function () {
-        $pInfo.kill();
+        if (!$pInfo.wmic.killed) {
+            $pInfo.wmic.kill();
+        }
     }, 60000);
     var d = this.data;
     this.data = "";
     this.wmic.stdout.emit("message", d);
 }, 10, {leading: false, trailing: true});
+
+Win32ProcInfo.prototype.close = function () {
+    var $pInfo = this;
+    $pInfo.closed = true;
+    if (!$pInfo.wmic.killed) {
+        $pInfo.wmic.kill();
+        clearTimeout($pInfo.timeout);
+    }
+};
 
 // Command for all: wmic path Win32_PerfFormattedData_PerfProc_Process where IDProcess=7872 get IDProcess,Name,IODataBytesPersec,WorkingSet,PercentProcessorTime
 
