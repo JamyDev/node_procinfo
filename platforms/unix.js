@@ -1,4 +1,5 @@
-var procinfo = require('procinfo');
+var usage = require('usage');
+var cores = require("os").cpus().length;
 
 function UnixProcInfo (pid) {
     var $pInfo = this;
@@ -42,13 +43,13 @@ UnixProcInfo.prototype.getCurrentDiskIO = function (callback) {
 };
 
 UnixProcInfo.prototype.getAllStats = function (callback) {
-    procinfo(this.pid, function (err, res) {
+    usage.lookup(this.pid, {keepHistory: true}, function (err, res) {
         if (err) {
             callback("Failed to get stats: "+err, 0);
         } else {
             var all = {
-                cpu: res[0].pcpu,
-                mem: res[0].pmem,
+                cpu: Math.round(res.cpu / cores),
+                mem: res.memory,
                 // disk: res.IODataBytesPersec
             };
             callback(null, all);

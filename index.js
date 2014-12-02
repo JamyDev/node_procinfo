@@ -1,11 +1,14 @@
-var Win32ProcInfo = require("./platforms/win32.js");
 
 function ProcInfo (pid) {
     this.pid = pid;
 
     if (isProcessRunning(pid)) {
         if (process.platform === "win32") {
+            var Win32ProcInfo = require("./platforms/win32.js");
             return new Win32ProcInfo(pid);
+        } else { 
+            var UnixProcInfo = require("./platforms/unix.js");
+            return new UnixProcInfo(pid);
         }
     } else {
         return false;
