@@ -7,21 +7,8 @@ var exec        = require("child_process").exec,
 function Win32ProcInfo (pid) {
     var $pInfo = this;
     $pInfo.pid = pid;
-    $pInfo.wmic = spawn("wmic", [], {detached: true});
-
-    $pInfo.wmic.stdout.on("data", function (data) {
-        $pInfo.data += data.toString("UTF8").replace("wmic:root\\cli>", "");
-        if ($pInfo.data.length > 3)
-            $pInfo.WMICMessage();
-    });
-
-    $pInfo.data = "";
-
-    $pInfo.timeout = setTimeout(function () {
-        if (!$pInfo.wmic.killed) {
-            $pInfo.wmic.kill();
-        }
-    }, 60000);
+    
+    $pInfo.spawnWMIC();
 }
 
 Win32ProcInfo.prototype.getCurrentCPU = function (callback) {
@@ -75,11 +62,17 @@ Win32ProcInfo.prototype.getAllStats = function (callback) {
 
 Win32ProcInfo.prototype.fireWMIC = function (command, callback) {
     var $pInfo = this;
+    this.wmic.stdout.removeAllListeners("message");
     this.wmic.stdout.once("message", function (stdout) {
         properties.parse(stdout, callback);
     });
 
-    this.wmic.stdin.write(new Buffer(command + " /FORMAT:LIST\n", "UTF8"));
+    if ($pInfo.wmic.killed) {
+        $pInfo.spawnWMIC();
+    }
+    setImmediate(function () {
+        $pInfo.wmic.stdin.write(new Buffer(command + " /FORMAT:LIST\n", "UTF8"));
+    });
 };
 
 Win32ProcInfo.prototype.WMICMessage = _.throttle(function () {
@@ -103,6 +96,26 @@ Win32ProcInfo.prototype.close = function () {
         clearTimeout($pInfo.timeout);
     }
 };
+
+Win32ProcInfo.prototype.spawnWMIC = function () {
+    var $pInfo = this;
+
+    $pInfo.wmic = spawn("wmic", [], {detached: true});
+
+    $pInfo.wmic.stdout.on("data", function (data) {
+        $pInfo.data += data.toString("UTF8").replace("wmic:root\\cli>", "");
+        if ($pInfo.data.length > 3)
+            $pInfo.WMICMessage();
+    });
+
+    $pInfo.data = "";
+
+    $pInfo.timeout = setTimeout(function () {
+        if (!$pInfo.wmic.killed) {
+            $pInfo.wmic.kill();
+        }
+    }, 60000);
+}
 
 // Command for all: wmic path Win32_PerfFormattedData_PerfProc_Process where IDProcess=7872 get IDProcess,Name,IODataBytesPersec,WorkingSet,PercentProcessorTime
 
