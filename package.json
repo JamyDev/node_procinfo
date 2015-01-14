@@ -1,6 +1,6 @@
 {
   "name": "procinfo-universal",
-  "version": "0.0.2-12",
+  "version": "0.0.2-16",
   "description": "Shows information about a process, like CPU usage, memory usage and disk usage. It should work on most major platforms (including Windows)",
   "main": "index.js",
   "scripts": {

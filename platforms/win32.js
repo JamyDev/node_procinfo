@@ -1,7 +1,8 @@
 var exec        = require("child_process").exec,
     spawn       = require("child_process").spawn,
     properties  = require("properties"),
-    _           = require("lodash");
+    _           = require("lodash")
+    numCPUs     = require("os").cpus().length;
 
 
 function Win32ProcInfo (pid) {
@@ -16,7 +17,7 @@ Win32ProcInfo.prototype.getCurrentCPU = function (callback) {
         if (err) {
             callback("Failed to get CPU: "+err, 0);
         } else {
-            var cpu = res.PercentProcessorTime;
+            var cpu = ((res.PercentProcessorTime || 0) / numCPUs);
             callback(null, cpu);
         }
     });
@@ -27,7 +28,7 @@ Win32ProcInfo.prototype.getCurrentMemory = function (callback) {
         if (err) {
             callback("Failed to get Mem: "+err, 0);
         } else {
-            var mem = res.WorkingSet;
+            var mem = res.WorkingSet || 0;
             callback(null, mem);
         }
     });
@@ -38,7 +39,7 @@ Win32ProcInfo.prototype.getCurrentDiskIO = function (callback) {
         if (err) {
             callback("Failed to get Disk: "+err, 0);
         } else {
-            var disk = res.IODataBytesPersec;
+            var disk = res.IODataBytesPersec || 0;
             callback(null, disk);
         }
     });
@@ -50,9 +51,9 @@ Win32ProcInfo.prototype.getAllStats = function (callback) {
             callback("Failed to get Disk: "+err, 0);
         } else {
             var all = {
-                cpu: res.PercentProcessorTime,
-                mem: res.WorkingSet,
-                disk: res.IODataBytesPersec
+                cpu: ((res.PercentProcessorTime || 0) / numCPUs),
+                mem: res.WorkingSet || 0,
+                disk: res.IODataBytesPersec || 0
             };
             callback(null, all);
         }
